@@ -1,0 +1,15 @@
+# Ambientes virtuais e cache Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Arquivos temporários e de sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# Saídas geradas (para não versionar dados pessoais / documentos gerados)
+saida/

@@ -1,0 +1,15 @@
+Boleto do Plano de Saúde Unimed – Referente a {referencia}
+
+Segue, em anexo, o boleto referente ao plano de saúde Unimed, referente ao mês de {referencia}.
+O valor total é de R$ {valor_total} e vencimento do boleto é em {data_final_mes}.
+
+Em caso de atraso, poderão ser cobrados juros, multa e demais encargos financeiros cabíveis.
+
+Ressaltamos que a inadimplência por período superior a sessenta dias, consecutivos ou não, poderá resultar na rescisão unilateral do plano e/ou na inscrição do débito em dívida ativa, conforme previsto no § 4º do art. 2º e no art. 5º da Lei nº 9.988, de 14 de novembro de 2023.
+
+
+Em caso de dúvidas, entre em contato com o RH da Prefeitura de Piracicaba pelo telefone 3403-1006 e fale com André.
+
+A mesma cobrança foi enviada pelos correios ao endereço cadastrado no sistema. Caso já tenha feito o pagamento, desconsidere este e-mail.
+
+Por favor, confirmar o recebimento deste e-mail.

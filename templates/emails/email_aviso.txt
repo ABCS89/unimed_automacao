@@ -1,0 +1,18 @@
+Aviso de Cancelamento do Plano de Saúde Unimed
+
+
+A/C {nome}
+
+Em virtude da verificação de pendências relacionadas ao pagamento do Plano de Saúde dos Servidores Públicos de Piracicaba, encaminhamos este comunicado para regularizar os valores devidos e restituir aos cofres públicos municipais a importância total de R$ {valor_total}, atualizada até a presente data, referente a mensalidades, coparticipações e encargos financeiros diariamente ajustados até a quitação dos débitos, conforme detalhado abaixo:
+
+{tabela}
+
+Ressaltamos que a inadimplência por período superior a sessenta dias, consecutivos ou não, poderá resultar na rescisão unilateral do plano e/ou na inscrição do débito em dívida ativa, conforme previsto no § 4º do art. 2º e no art. 5º da Lei nº
+9.988, de 14 de novembro de 2023.
+
+Dessa forma, solicitamos seu comparecimento ao Departamento de Recursos Humanos em tempo hábil para regularização, sob pena de cancelamento do plano e/ou na inscrição do débito em dívida ativa.
+
+Em caso de dúvidas, entre em contato com o RH da Prefeitura de Piracicaba pelo telefone 3403-1006, e fale com André.
+
+Permanecemos à disposição para esclarecimentos.
+

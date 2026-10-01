@@ -1,0 +1,27 @@
+=============================================================================
+MEDIDAS DAX SUGERIDAS PARA O DASHBOARD DEVEDORES UNIMED
+=============================================================================
+
+1. TOTAL DA DÍVIDA ATUALIZADA (Para Cartões de Destaque e Tabelas)
+Total Atualizado = 
+SUM('Base_Devedores_Unimed'[Saldo (Atualizado)])
+
+2. TOTAL DA DÍVIDA PRINCIPAL (Valor sem encargos)
+Total Principal = 
+SUM('Base_Devedores_Unimed'[Principal (Saldo)])
+
+3. QUANTIDADE DE BOLETOS EM ABERTO
+Nº de Boletos = 
+DISTINCTCOUNT('Base_Devedores_Unimed'[#])
+
+4. QUANTIDADE DE SERVIDORES EM DÉBITO
+Total de Devedores = 
+DISTINCTCOUNT('Base_Devedores_Unimed'[Nome])
+
+5. VALOR MÉDIO DEVIDO POR SERVIDOR
+Ticket Médio por Devedor = 
+DIVIDE([Total Atualizado], [Total de Devedores], 0)
+
+6. TOTAL DE MULTAS/JUROS ACUMULADOS
+Total Juros e Encargos = 
+[Total Atualizado] - [Total Principal]
