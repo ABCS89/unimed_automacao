@@ -35,12 +35,13 @@ No Power BI Desktop, com a tabela `Base_Devedores_Unimed` selecionada à direita
 
 ## 🎨 Passo 3: Montar a Listagem com Visual Profissional
 
-### 1. A Tabela de Inadimplentes (O que você solicitou)
+### 1. A Tabela de Inadimplentes (Listagem Completa)
 1. No painel **Visualizações**, clique no ícone de **Tabela** ou **Matriz**.
 2. Arraste para a tabela os seguintes campos:
    * `Nome`
-   * `Status do Plano` *(mostra se é Inadimplente, Cancelado ou Desligado)*
-   * `Sit. Vinculo` *(Aux. Doença, Em Folha, Falta...)*
+   * `Status do Servidor` *(Ativo ou Desligado)*
+   * `Status do Plano` *(Inadimplente (Aviso) ou Cancelado)*
+   * `Sit. Vínculo` *(Auxílio Doença, Em Folha, Afastamento sem Vencimentos, etc.)*
    * Medida `[Nº de Boletos]`
    * Medida `[Total Atualizado]`
 3. **Ativar Barras de Dados Coloridas:**
@@ -55,16 +56,18 @@ No Power BI Desktop, com a tabela `Base_Devedores_Unimed` selecionada à direita
 
 ### 2. Cartões de Indicadores no Topo (KPIs)
 Adicione 3 visuais de **Cartão** no topo do relatório:
-* **Cartão 1:** Medida `[Total Atualizado]` *(exibe R$ 78,17 mil)*
+* **Cartão 1:** Medida `[Total Atualizado]` *(exibe o valor total da dívida)*
+  * *Dica de formatação*: selecione o cartão > vá no pincel de Formatação > **Valor do balão** > em **Exibir unidades**, mude de "Automático" para **Nenhum** (ou deixe 2 casas decimais) para exibir `R$ 78.168,97` exato!
 * **Cartão 2:** Medida `[Total de Devedores]` *(exibe 64 servidores)*
-* **Cartão 3:** Medida `[Nº de Boletos]` *(exibe 168 boletos)*
+* **Cartão 3:** Medida `[Nº de Boletos]` *(exibe 167 boletos)*
 
 ---
 
 ### 3. Segmentação de Dados (Filtros Clicáveis)
-Adicione 2 visuais de **Segmentação de Dados (Filtro)**:
-* **Filtro 1:** Campo `Status do Plano` (botões para alternar entre *Inadimplente (Aviso)*, *Cancelado* e *Desligado*).
-* **Filtro 2:** Campo `Sit. Vinculo` (para filtrar por *Em Folha*, *Aux. Doença*, etc.).
+Adicione 3 visuais de **Segmentação de Dados (Filtro)**:
+* **Filtro 1:** Campo `Status do Servidor` (*Ativo* ou *Desligado*).
+* **Filtro 2:** Campo `Status do Plano` (*Inadimplente (Aviso)* ou *Cancelado*).
+* **Filtro 3:** Campo `Sit. Vínculo` (*Auxílio Doença*, *Em Folha*, *Afastamento*, etc.).
 
 ---
 
