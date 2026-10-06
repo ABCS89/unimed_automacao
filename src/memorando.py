@@ -63,11 +63,11 @@ def gerar_memorando():
         cpf = limpa(row.get("cpf"))
 
         dt_nasc = row.get("data_nascimento")
-        if pd.notna(dt_nasc):
+        if pd.notna(dt_nasc) and str(dt_nasc).strip():
             try:
-                data_nasc_str = pd.to_datetime(dt_nasc).strftime("%d/%m/%Y")
+                data_nasc_str = pd.to_datetime(dt_nasc, dayfirst=True).strftime("%d/%m/%Y")
             except Exception:
-                data_nasc_str = str(dt_nasc)
+                data_nasc_str = str(dt_nasc).strip()
         else:
             data_nasc_str = ""
 

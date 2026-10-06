@@ -10,6 +10,22 @@ __pycache__/
 Thumbs.db
 *.tmp
 *.log
+~$*
 
 # Saídas geradas (para não versionar dados pessoais / documentos gerados)
 saida/
+
+# Arquivos sensíveis e planilhas com dados pessoais (LGPD / Sigilo)
+*.ods
+*.xlsx
+*.xls
+*.csv
+*.odb
+*.pbix
+*.pdf
+entrada/pdfs_envio/
+entrada/*.ods
+entrada/*.xlsx
+entrada/*.odb
+*_backup.*
+templates/template_retroativo_exemplo_original.docx

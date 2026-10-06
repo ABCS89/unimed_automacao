@@ -57,6 +57,7 @@ unimed_automacao/
     ├── memorando.py              # Rotina de geração do memorando
     ├── refis.py                  # Rotina de geração de acordos Refis
     ├── lista.py                  # Rotina de listagem de servidores
+    ├── enriquecer_base.py        # Autopreenchimento e enriquecimento cadastral via histórico
     └── converter_pdf.py          # Conversão em lote de DOCX para PDF (Pós-validação)
 ```
 
@@ -111,9 +112,10 @@ Será exibido o menu interativo:
   6. [LISTA] Gerar Lista Consolidada de Servidores
   7. [TUDO] Executar TUDO (Rotina Mensal de Geracao DOCX)
   8. [CONVERTER PDF] Converter DOCX para PDF (Pos-Validacao)
+  9. [BASE] Autopreencher / Enriquecer mês atual com histórico de teste.ods
   0. [SAIR] Sair
 ============================================================
-Digite a opcao desejada [0-8]:
+Digite a opcao desejada [0-9]:
 ```
 
 Ao escolher a opção **`8`**, um submenu permite converter pastas específicas (só cartas, só memorando, etc.) ou converter toda a pasta `saida/` de uma única vez.

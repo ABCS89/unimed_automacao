@@ -56,10 +56,10 @@ No Power BI Desktop, com a tabela `Base_Devedores_Unimed` selecionada à direita
 
 ### 2. Cartões de Indicadores no Topo (KPIs)
 Adicione 3 visuais de **Cartão** no topo do relatório:
-* **Cartão 1:** Medida `[Total Atualizado]` *(exibe o valor total da dívida)*
-  * *Dica de formatação*: selecione o cartão > vá no pincel de Formatação > **Valor do balão** > em **Exibir unidades**, mude de "Automático" para **Nenhum** (ou deixe 2 casas decimais) para exibir `R$ 78.168,97` exato!
-* **Cartão 2:** Medida `[Total de Devedores]` *(exibe 64 servidores)*
-* **Cartão 3:** Medida `[Nº de Boletos]` *(exibe 167 boletos)*
+* **Cartão 1:** Medida `[Total Atualizado]` *(exibe o valor total da dívida acumulada)*
+  * *Dica de formatação*: selecione o cartão > vá no pincel de Formatação > **Valor do balão** > em **Exibir unidades**, mude de "Automático" para **Nenhum** (ou deixe 2 casas decimais) para exibir o valor monetário formatado.
+* **Cartão 2:** Medida `[Total de Devedores]` *(exibe a contagem distinta de servidores)*
+* **Cartão 3:** Medida `[Nº de Boletos]` *(exibe a quantidade de boletos em aberto)*
 
 ---
 

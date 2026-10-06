@@ -24,6 +24,7 @@ from src.memorando import gerar_memorando
 from src.refis import gerar_todos_refis
 from src.lista import gerar_lista
 from src.converter_pdf import menu_conversao_pdf, converter_toda_saida
+from src.enriquecer_base import enriquecer_base_mes
 
 
 def executar_tudo():
@@ -56,10 +57,11 @@ def menu_interativo():
         print("  6. [LISTA] Gerar Lista Consolidada de Servidores")
         print("  7. [TUDO] Executar TUDO (Rotina Mensal de Geracao DOCX)")
         print("  8. [CONVERTER PDF] Converter DOCX para PDF (Pos-Validacao)")
+        print("  9. [BASE] Autopreencher / Enriquecer mês atual com histórico de teste.ods")
         print("  0. [SAIR] Sair")
         print("=" * 60)
 
-        opcao = input("Digite a opcao desejada [0-8]: ").strip()
+        opcao = input("Digite a opcao desejada [0-9]: ").strip()
 
         if opcao == "1":
             gerar_todas_cartas_mensais()
@@ -77,18 +79,20 @@ def menu_interativo():
             executar_tudo()
         elif opcao == "8":
             menu_conversao_pdf()
+        elif opcao == "9":
+            enriquecer_base_mes()
         elif opcao == "0":
             print("\nEncerrando o programa. Até logo!\n")
             break
         else:
-            print("\n[AVISO] Opcao invalida! Digite um numero entre 0 e 8.")
+            print("\n[AVISO] Opcao invalida! Digite um numero entre 0 e 9.")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Automação do fluxo Unimed (DRH)")
     parser.add_argument(
         "--acao",
-        choices=["cartas", "multa", "emails", "memorando", "refis", "lista", "tudo", "converter_pdf"],
+        choices=["cartas", "multa", "emails", "memorando", "refis", "lista", "tudo", "converter_pdf", "enriquecer", "base"],
         help="Executa uma ação diretamente sem abrir o menu interativo"
     )
 
@@ -110,6 +114,8 @@ def main():
         executar_tudo()
     elif args.acao == "converter_pdf":
         converter_toda_saida()
+    elif args.acao in ("enriquecer", "base"):
+        enriquecer_base_mes()
     else:
         menu_interativo()
 
