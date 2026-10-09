@@ -9,8 +9,9 @@ import shutil
 from pathlib import Path
 import pandas as pd
 
-from .config import ARQUIVO_BASE
+from .config import ARQUIVO_BASE, ARQUIVO_DEVEDORES
 from .utils import normalizar_nome, limpa
+from .cruzamento import carregar_bases_cruzamento, classificar_servidor
 
 MESES_ORDEM = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -219,6 +220,9 @@ def enriquecer_base_mes(caminho_base=None, mes_alvo=None, fazer_backup=True):
 
     print(f"[INFO] Base histórica acumulada: {len(hist_func)} servidores mapeados dos meses anteriores.")
 
+    # Cruzar com bases de inadimplência e desligados do mês
+    contexto_cruzamento = carregar_bases_cruzamento(caminho_base, ARQUIVO_DEVEDORES, caminho_base.parent)
+
     # Cruzar dados
     linhas_enriquecidas = []
     recuperados = 0
@@ -239,6 +243,10 @@ def enriquecer_base_mes(caminho_base=None, mes_alvo=None, fazer_backup=True):
             novos.append((func_str, nome))
             mes_origem = None
 
+        # Classificação automática pelo sistema (devedores / desligados)
+        cond_cruzada = classificar_servidor(row, contexto_cruzamento)
+        cond_final = "" if cond_cruzada == "normal" else cond_cruzada
+
         # Montar linha nas 15 colunas padrão
         nova_linha = {
             "Nro Funcional": int(func_orig) if pd.notna(func_orig) and str(func_orig).isdigit() else func_orig,
@@ -248,7 +256,7 @@ def enriquecer_base_mes(caminho_base=None, mes_alvo=None, fazer_backup=True):
             "Mensalidade": float(row.get("Mensalidade", 0.0) or 0.0),
             "Coparticipação": float(row.get("Coparticipação", 0.0) or 0.0),
             "Total": float(row.get("Total", 0.0) or 0.0),
-            "condição": cad.get("condição", ""),
+            "condição": cond_final,
             "mail": cad.get("mail", ""),
             "CEP": cad.get("CEP", ""),
             "endereço": cad.get("endereço", ""),

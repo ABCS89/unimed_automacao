@@ -22,6 +22,7 @@ from .config import (
 )
 from .utils import (
     limpa,
+    normalizar_nome,
     capitalizar_nome,
     formatar_valor_br,
     valor_por_extenso,
@@ -33,6 +34,7 @@ from .utils import (
     mes_anterior,
     limpar_nome_arquivo,
 )
+from .cruzamento import carregar_bases_cruzamento, classificar_servidor, obter_debitos_servidor
 
 
 def _preparar_contextos_data(hoje=None):
@@ -130,11 +132,9 @@ def gerar_carta_base_ou_desligado(linha, template_path, contexto_datas, pdf_map,
     doc.save(pasta_saida / f"{nome_seguro}.docx")
 
 
-def gerar_carta_aviso_ou_cancelado(linha, condicao, template_path, df_dividas, contexto_datas, pasta_saida):
+def gerar_carta_aviso_ou_cancelado(linha, condicao, template_path, contexto_cruzamento, contexto_datas, pasta_saida):
     nome = limpa(linha.get("Funcionário"))
-    matricula = limpa(linha.get("Nro Funcional"))
-
-    df_pessoa = df_dividas[df_dividas["Funcional"] == matricula]
+    df_pessoa = obter_debitos_servidor(linha, contexto_cruzamento, condicao)
     if df_pessoa.empty:
         print(f"  [AVISO] Sem dívidas cadastradas para: {nome} ({condicao}) - carta não gerada")
         return False
@@ -192,6 +192,18 @@ def gerar_todas_cartas_mensais():
     CARTAS_BASE_DIR.mkdir(parents=True, exist_ok=True)
     CARTAS_CANCELADOS_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Limpar docx anteriores para evitar arquivos obsoletos
+    for f in CARTAS_BASE_DIR.glob("*.docx"):
+        try:
+            f.unlink()
+        except Exception:
+            pass
+    for f in CARTAS_CANCELADOS_DIR.glob("*.docx"):
+        try:
+            f.unlink()
+        except Exception:
+            pass
+
     if not ARQUIVO_BASE.exists():
         print(f"[ERRO] Arquivo base não encontrado: {ARQUIVO_BASE}")
         return
@@ -200,13 +212,12 @@ def gerar_todas_cartas_mensais():
         print(f"[ERRO] Arquivo de devedores não encontrado: {ARQUIVO_DEVEDORES}")
         return
 
-    df_base = pd.read_excel(ARQUIVO_BASE, engine="odf")
-    df_dividas = pd.read_excel(ARQUIVO_DEVEDORES, sheet_name="Inadimplentes")
-    df_cancelados = pd.read_excel(ARQUIVO_DEVEDORES, sheet_name="Cancelados")
+    contexto_cruzamento = carregar_bases_cruzamento(ARQUIVO_BASE, ARQUIVO_DEVEDORES, PASTA_PDFS_ENVIO.parent)
+    df_dividas = contexto_cruzamento["df_dividas"]
+    df_cancelados = contexto_cruzamento["df_cancelados"]
 
+    df_base = pd.read_excel(ARQUIVO_BASE, engine="odf")
     df_base["Nro Funcional"] = pd.to_numeric(df_base["Nro Funcional"], errors="coerce").astype("Int64").astype(str)
-    df_dividas["Funcional"] = pd.to_numeric(df_dividas["Funcional"], errors="coerce").astype("Int64").astype(str)
-    df_cancelados["Funcional"] = pd.to_numeric(df_cancelados["Funcional"], errors="coerce").astype("Int64").astype(str)
 
     hoje = datetime.today()
     contexto_datas = _preparar_contextos_data(hoje)
@@ -220,9 +231,9 @@ def gerar_todas_cartas_mensais():
     contadores = {"base": 0, "desligado": 0, "aviso": 0, "cancelado": 0, "ignorado": 0}
 
     for _, linha in df_base.iterrows():
-        condicao = limpa(linha.get("condição")).lower()
+        condicao = classificar_servidor(linha, contexto_cruzamento)
 
-        if "não enviar" in condicao or "nao enviar" in condicao:
+        if condicao == "ignorado":
             contadores["ignorado"] += 1
             continue
 
@@ -234,29 +245,29 @@ def gerar_todas_cartas_mensais():
 
         elif condicao == "aviso":
             ok = gerar_carta_aviso_ou_cancelado(
-                linha, condicao, TEMPLATE_AVISO, df_dividas, contexto_datas, CARTAS_CANCELADOS_DIR
+                linha, condicao, TEMPLATE_AVISO, contexto_cruzamento, contexto_datas, CARTAS_CANCELADOS_DIR
             )
             if ok:
                 contadores["aviso"] += 1
 
         elif condicao == "cancelado":
             ok = gerar_carta_aviso_ou_cancelado(
-                linha, condicao, TEMPLATE_CANCELADO, df_cancelados, contexto_datas, CARTAS_CANCELADOS_DIR
+                linha, condicao, TEMPLATE_CANCELADO, contexto_cruzamento, contexto_datas, CARTAS_CANCELADOS_DIR
             )
             if ok:
                 contadores["cancelado"] += 1
 
-        elif condicao in ("", "nan"):
+        elif condicao == "normal":
             gerar_carta_base_ou_desligado(
                 linha, TEMPLATE_BASE, contexto_datas, pdf_map, CARTAS_BASE_DIR
             )
             contadores["base"] += 1
 
     print("\n[OK] Resumo da geração de cartas mensais:")
-    print(f"   * Cartas Base: {contadores['base']} (em {CARTAS_BASE_DIR.relative_to(CARTAS_BASE_DIR.parent.parent.parent)})")
-    print(f"   * Cartas Desligado: {contadores['desligado']} (em {CARTAS_BASE_DIR.relative_to(CARTAS_BASE_DIR.parent.parent.parent)})")
+    print(f"   * Cartas Base (Ativos): {contadores['base']} (em {CARTAS_BASE_DIR.relative_to(CARTAS_BASE_DIR.parent.parent.parent)})")
+    print(f"   * Cartas Desligados: {contadores['desligado']} (em {CARTAS_BASE_DIR.relative_to(CARTAS_BASE_DIR.parent.parent.parent)})")
     print(f"   * Cartas Aviso: {contadores['aviso']} (em {CARTAS_CANCELADOS_DIR.relative_to(CARTAS_CANCELADOS_DIR.parent.parent.parent)})")
-    print(f"   * Cartas Cancelado: {contadores['cancelado']} (em {CARTAS_CANCELADOS_DIR.relative_to(CARTAS_CANCELADOS_DIR.parent.parent.parent)})")
+    print(f"   * Cartas Cancelados: {contadores['cancelado']} (em {CARTAS_CANCELADOS_DIR.relative_to(CARTAS_CANCELADOS_DIR.parent.parent.parent)})")
     print(f"   * Ignorados ('não enviar'): {contadores['ignorado']}")
 
 
@@ -279,10 +290,10 @@ def gerar_todas_cartas_multa():
         return
 
     df_base = pd.read_excel(ARQUIVO_BASE, engine="odf")
-    df_dividas = pd.read_excel(ARQUIVO_DEVEDORES, sheet_name="Inadimplentes")
+    contexto_cruzamento = carregar_bases_cruzamento(ARQUIVO_BASE, ARQUIVO_DEVEDORES, PASTA_PDFS_ENVIO.parent)
+    df_dividas = contexto_cruzamento["df_dividas"]
 
     df_base["Nro Funcional"] = pd.to_numeric(df_base["Nro Funcional"], errors="coerce").astype("Int64").astype(str)
-    df_dividas["Funcional"] = pd.to_numeric(df_dividas["Funcional"], errors="coerce").astype("Int64").astype(str)
 
     hoje = datetime.today()
     contexto_datas = _preparar_contextos_data(hoje)
@@ -308,9 +319,9 @@ def gerar_todas_cartas_multa():
             continue
 
         linha_base = pessoa_base.iloc[0]
-        condicao = limpa(linha_base.get("condição")).lower()
-        if condicao not in ("", "nan"):
-            continue  # apenas para condição base
+        condicao = classificar_servidor(linha_base, contexto_cruzamento)
+        if condicao != "normal":
+            continue  # apenas para condição base/normal
 
         funcionario_raw = linha_base["Funcionário"]
         if matricula in pdf_map:

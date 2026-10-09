@@ -14,12 +14,14 @@ from .config import (
 )
 from .utils import (
     limpa,
+    normalizar_nome,
     formatar_valor_br,
     formatar_moeda,
     ultimo_dia_util_do_mes,
     mes_referencia_texto,
     formata_competencia,
 )
+from .cruzamento import carregar_bases_cruzamento, classificar_servidor, obter_debitos_servidor
 
 
 def _gerar_tabela_markdown(tabela_itens):
@@ -98,14 +100,13 @@ def gerar_todos_emails():
     with open(EMAILS_TEMPLATES_DIR / "email_cancelado.txt", "r", encoding="utf-8") as f:
         template_cancelado = f.read()
 
-    # Ler dados
+    # Ler dados e bases cruzadas
     df_base = pd.read_excel(ARQUIVO_BASE, engine="odf")
-    df_dividas = pd.read_excel(ARQUIVO_DEVEDORES, sheet_name="Inadimplentes")
-    df_cancelados = pd.read_excel(ARQUIVO_DEVEDORES, sheet_name="Cancelados")
+    contexto_cruzamento = carregar_bases_cruzamento(ARQUIVO_BASE, ARQUIVO_DEVEDORES, ARQUIVO_BASE.parent)
+    df_dividas = contexto_cruzamento["df_dividas"]
+    df_cancelados = contexto_cruzamento["df_cancelados"]
 
     df_base["Nro Funcional"] = pd.to_numeric(df_base["Nro Funcional"], errors="coerce").astype("Int64").astype(str)
-    df_dividas["Funcional"] = pd.to_numeric(df_dividas["Funcional"], errors="coerce").astype("Int64").astype(str)
-    df_cancelados["Funcional"] = pd.to_numeric(df_cancelados["Funcional"], errors="coerce").astype("Int64").astype(str)
 
     hoje = datetime.today()
     data_envio = hoje.strftime("%d/%m/%Y")
@@ -118,19 +119,8 @@ def gerar_todos_emails():
     emails_cancelados = []
 
     for _, row in df_base.iterrows():
-        condicao = limpa(row.get("condição")).lower()
-
-        if "não enviar" in condicao or "nao enviar" in condicao:
-            continue
-        elif condicao == "desligado":
-            tipo = "desligado"
-        elif condicao == "aviso":
-            tipo = "aviso"
-        elif condicao == "cancelado":
-            tipo = "cancelado"
-        elif condicao in ("", "nan"):
-            tipo = "normal"
-        else:
+        tipo = classificar_servidor(row, contexto_cruzamento)
+        if tipo == "ignorado":
             continue
 
         nome = limpa(row.get("Funcionário"))
@@ -145,7 +135,10 @@ def gerar_todos_emails():
             valor_total_final = str(total_base).replace("R$", "").strip()
 
         if tipo in ["aviso", "cancelado"]:
-            df_func = df_dividas[df_dividas["Funcional"] == matricula] if tipo == "aviso" else df_cancelados[df_cancelados["Funcional"] == matricula]
+            df_func = obter_debitos_servidor(row, contexto_cruzamento, tipo)
+            if df_func.empty:
+                print(f"  [AVISO] Sem dívidas cadastradas para: {nome} ({tipo}) - e-mail não incluído")
+                continue
 
             total_dividas = pd.to_numeric(df_func["Saldo (Atualizado)"], errors="coerce").fillna(0).sum()
             valor_total_final = formatar_valor_br(total_dividas)

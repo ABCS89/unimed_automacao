@@ -25,6 +25,7 @@ from src.refis import gerar_todos_refis
 from src.lista import gerar_lista
 from src.converter_pdf import menu_conversao_pdf, converter_toda_saida
 from src.enriquecer_base import enriquecer_base_mes
+from src.retroativos import gerar_documentos_retroativos
 
 
 def executar_tudo():
@@ -37,6 +38,7 @@ def executar_tudo():
     gerar_memorando()
     gerar_todos_refis()
     gerar_lista()
+    gerar_documentos_retroativos()
     print("\n" + "#" * 60)
     print("[SUCESSO] TODAS AS ROTINAS DE GERACAO FORAM CONCLUIDAS!")
     print("Nota: Para converter os arquivos gerados em PDF apos a sua")
@@ -58,10 +60,11 @@ def menu_interativo():
         print("  7. [TUDO] Executar TUDO (Rotina Mensal de Geracao DOCX)")
         print("  8. [CONVERTER PDF] Converter DOCX para PDF (Pos-Validacao)")
         print("  9. [BASE] Autopreencher / Enriquecer mês atual com histórico de teste.ods")
+        print(" 10. [RETROATIVOS] Gerar Cobrança de Retroativos em Folha (Sugestão e Ofício)")
         print("  0. [SAIR] Sair")
         print("=" * 60)
 
-        opcao = input("Digite a opcao desejada [0-9]: ").strip()
+        opcao = input("Digite a opcao desejada [0-10]: ").strip()
 
         if opcao == "1":
             gerar_todas_cartas_mensais()
@@ -81,18 +84,20 @@ def menu_interativo():
             menu_conversao_pdf()
         elif opcao == "9":
             enriquecer_base_mes()
+        elif opcao == "10":
+            gerar_documentos_retroativos()
         elif opcao == "0":
             print("\nEncerrando o programa. Até logo!\n")
             break
         else:
-            print("\n[AVISO] Opcao invalida! Digite um numero entre 0 e 9.")
+            print("\n[AVISO] Opcao invalida! Digite um numero entre 0 e 10.")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Automação do fluxo Unimed (DRH)")
     parser.add_argument(
         "--acao",
-        choices=["cartas", "multa", "emails", "memorando", "refis", "lista", "tudo", "converter_pdf", "enriquecer", "base"],
+        choices=["cartas", "multa", "emails", "memorando", "refis", "lista", "tudo", "converter_pdf", "enriquecer", "base", "retroativos"],
         help="Executa uma ação diretamente sem abrir o menu interativo"
     )
 
@@ -110,6 +115,8 @@ def main():
         gerar_todos_refis()
     elif args.acao == "lista":
         gerar_lista()
+    elif args.acao == "retroativos":
+        gerar_documentos_retroativos()
     elif args.acao == "tudo":
         executar_tudo()
     elif args.acao == "converter_pdf":

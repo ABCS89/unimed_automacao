@@ -28,6 +28,8 @@ unimed_automacao/
 │   ├── template_memorando.docx   # Memorando oficial consolidado
 │   ├── template_refis.docx       # Termo de acordo e confissão de dívida Refis
 │   ├── template_lista.docx       # Listagem consolidada de servidores
+│   ├── template_retroativo_sugestao.docx # Sugestão amigável de desconto em folha
+│   ├── template_retroativo_oficio.docx   # Notificação formal de desconto de ofício
 │   └── emails/                   # Templates de texto para e-mails
 │       ├── email_normal.txt
 │       ├── email_desligados.txt
@@ -46,17 +48,22 @@ unimed_automacao/
 │   │   └── emails_cancelados.md
 │   ├── memorando/                # Memorando mensal gerado (.docx)
 │   ├── refis/                    # Termos de acordo do Refis (.docx)
-│   └── listas/                   # Lista consolidada de servidores (.docx)
+│   ├── listas/                   # Lista consolidada de servidores (.docx)
+│   └── retroativos/              # Cobrança de retroativos em folha (.docx)
+│       ├── sugestao/             # 1ª etapa: Proposta/sugestão de desconto
+│       └── oficio/               # 2ª etapa: Notificação formal de ofício
 │
 └── src/                          # Código-fonte modularizado
     ├── __init__.py
     ├── config.py                 # Caminhos absolutos e configurações
     ├── utils.py                  # Funções de data, moeda, num2words e texto
+    ├── cruzamento.py             # Inteligência de cruzamento entre bases
     ├── cartas.py                 # Rotinas de geração de cartas mensais e multas
     ├── emails.py                 # Rotinas de geração dos modelos de e-mail
     ├── memorando.py              # Rotina de geração do memorando
     ├── refis.py                  # Rotina de geração de acordos Refis
     ├── lista.py                  # Rotina de listagem de servidores
+    ├── retroativos.py            # Rotina de cobrança de retroativos em folha
     ├── enriquecer_base.py        # Autopreenchimento e enriquecimento cadastral via histórico
     └── converter_pdf.py          # Conversão em lote de DOCX para PDF (Pós-validação)
 ```
@@ -113,12 +120,13 @@ Será exibido o menu interativo:
   7. [TUDO] Executar TUDO (Rotina Mensal de Geracao DOCX)
   8. [CONVERTER PDF] Converter DOCX para PDF (Pos-Validacao)
   9. [BASE] Autopreencher / Enriquecer mês atual com histórico de teste.ods
+ 10. [RETROATIVOS] Gerar Cobrança de Retroativos em Folha (Sugestão e Ofício)
   0. [SAIR] Sair
 ============================================================
-Digite a opcao desejada [0-9]:
+Digite a opcao desejada [0-10]:
 ```
 
-Ao escolher a opção **`8`**, um submenu permite converter pastas específicas (só cartas, só memorando, etc.) ou converter toda a pasta `saida/` de uma única vez.
+Ao escolher a opção **`8`**, um submenu permite converter pastas específicas (só cartas, só retroativos, etc.) ou converter toda a pasta `saida/` de uma única vez.
 
 ### Modo 2: Linha de Comando Direta (Para automações ou atalhos)
 
@@ -138,6 +146,7 @@ python main.py --acao emails
 python main.py --acao memorando
 python main.py --acao refis
 python main.py --acao lista
+python main.py --acao retroativos
 ```
 
 ---
@@ -160,6 +169,17 @@ python main.py --acao lista
 3. **Cartas de Multa:**
    - Analisa a aba `Inadimplentes` da planilha `devedores.xlsx`.
    - Identifica parcelas onde o **`Saldo (Atualizado)` é positivo e menor do que a coluna `Principal (Saldo)`**. Isso ocorre quando o servidor pagou o boleto com atraso e restou pendente apenas a cobrança da diferença/juros, que é inserida para quitação conjunta com a guia do mês.
-4. **Modelos de E-mail:**
+4. **Cruzamento Automático entre Bases (Regra dos Boletos e Status):**
+   - O sistema classifica a condição de cada servidor automaticamente no momento da geração de cartas e e-mails:
+     - **Desligados:** Servidores que constarem na aba `Desligados` de `devedores.xlsx` (ou na planilha avulsa `entrada/desligados.xlsx`).
+     - **Cancelados Prévios:** Servidores que constarem na aba `Cancelados` de `devedores.xlsx` (ou na planilha avulsa `cancelados.xlsx`).
+     - **Inadimplência por Boletos em Aberto (Aba Inadimplentes):**
+       - **1 boleto em atraso:** Tratado como **Normal** (cobrança mensal regular via carta base e e-mail normal).
+       - **2 boletos em atraso:** Tratado como **Aviso de Cancelamento** (notificação prévia com tabela de débitos).
+       - **3 ou mais boletos em atraso:** Tratado como **Cancelamento** (notificação de rescisão por inadimplência com tabela de débitos).
+     - **Normais (Ativos):** Servidores ativos regulares sem débitos ou com apenas 1 boleto em atraso.
+     - **Ignorados:** Se a coluna `condição` em `teste.ods` contiver `"não enviar"`.
+   - Você não precisa mais ficar alterando a coluna `condição` em `teste.ods`; basta manter as planilhas principais atualizadas!
+5. **Modelos de E-mail:**
    - Classifica os servidores em quatro categorias: *Normais*, *Desligados*, *Avisos* e *Cancelados*.
    - Para as categorias com dívidas (*Avisos* e *Cancelados*), gera uma tabela formatada em Markdown detalhando competência, vencimento, valor principal, encargos e total.

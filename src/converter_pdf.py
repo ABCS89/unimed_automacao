@@ -13,6 +13,7 @@ from .config import (
     MEMORANDO_DIR,
     REFIS_DIR,
     LISTAS_DIR,
+    RETROATIVOS_DIR,
 )
 
 
@@ -145,6 +146,15 @@ def converter_lista():
     return qtd
 
 
+def converter_retroativos():
+    print("\n" + "=" * 60)
+    print(">>> CONVERTENDO DOCUMENTOS DE RETROATIVOS PARA PDF")
+    print("=" * 60)
+    qtd = converter_pasta(RETROATIVOS_DIR, recursivo=True)
+    print(f"[OK] Documentos de retroativos convertidos para PDF: {qtd}\n")
+    return qtd
+
+
 def converter_toda_saida():
     print("\n" + "=" * 60)
     print(">>> CONVERTENDO TODOS OS DOCUMENTOS DE SAIDA/ PARA PDF")
@@ -166,11 +176,12 @@ def menu_conversao_pdf():
         print("  2. [MEMORANDO] Converter apenas Memorando")
         print("  3. [REFIS] Converter apenas Termos do Refis")
         print("  4. [LISTA] Converter apenas Lista de Servidores")
-        print("  5. [TUDO] Converter TODOS os arquivos .docx da pasta saida/")
+        print("  5. [RETROATIVOS] Converter apenas Documentos de Retroativos (Sugestão/Ofício)")
+        print("  6. [TUDO] Converter TODOS os arquivos .docx da pasta saida/")
         print("  0. [VOLTAR] Voltar ao Menu Principal")
         print("=" * 60)
 
-        opcao = input("Digite a opcao desejada [0-5]: ").strip()
+        opcao = input("Digite a opcao desejada [0-6]: ").strip()
 
         if opcao == "1":
             converter_todas_cartas()
@@ -181,11 +192,13 @@ def menu_conversao_pdf():
         elif opcao == "4":
             converter_lista()
         elif opcao == "5":
+            converter_retroativos()
+        elif opcao == "6":
             converter_toda_saida()
         elif opcao == "0":
             break
         else:
-            print("\n[AVISO] Opção inválida! Digite um número entre 0 e 5.")
+            print("\n[AVISO] Opção inválida! Digite um número entre 0 e 6.")
 
 
 if __name__ == "__main__":

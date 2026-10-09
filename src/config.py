@@ -10,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENTRADA_DIR = BASE_DIR / "entrada"
 ARQUIVO_BASE = ENTRADA_DIR / "teste.ods"
 ARQUIVO_DEVEDORES = ENTRADA_DIR / "devedores.xlsx"
+ARQUIVO_DESLIGADOS = ENTRADA_DIR / "desligados.xlsx"
 PASTA_PDFS_ENVIO = ENTRADA_DIR / "pdfs_envio"
 
 # Pastas de templates
@@ -24,6 +25,9 @@ TEMPLATE_MULTA = TEMPLATES_DIR / "template_base_multa.docx"
 TEMPLATE_MEMORANDO = TEMPLATES_DIR / "template_memorando.docx"
 TEMPLATE_REFIS = TEMPLATES_DIR / "template_refis.docx"
 TEMPLATE_LISTA = TEMPLATES_DIR / "template_lista.docx"
+TEMPLATE_RETROATIVO_SUGESTAO = TEMPLATES_DIR / "template_retroativo_sugestao.docx"
+TEMPLATE_RETROATIVO_OFICIO = TEMPLATES_DIR / "template_retroativo_oficio.docx"
+TEMPLATE_ETIQUETA = ENTRADA_DIR / "template_etiqueta.odt"
 
 # Pastas de saída
 SAIDA_DIR = BASE_DIR / "saida"
@@ -32,9 +36,13 @@ CARTAS_BASE_DIR = CARTAS_DIR / "base"
 CARTAS_CANCELADOS_DIR = CARTAS_DIR / "cancelados_aviso"
 CARTAS_MULTA_DIR = CARTAS_DIR / "multa"
 EMAILS_DIR = SAIDA_DIR / "emails"
+EMAILS_RETROATIVOS_MD = EMAILS_DIR / "emails_retroativos.md"
 MEMORANDO_DIR = SAIDA_DIR / "memorando"
 REFIS_DIR = SAIDA_DIR / "refis"
 LISTAS_DIR = SAIDA_DIR / "listas"
+RETROATIVOS_DIR = SAIDA_DIR / "retroativos"
+RETROATIVOS_SUGESTAO_DIR = RETROATIVOS_DIR / "sugestao"
+RETROATIVOS_OFICIO_DIR = RETROATIVOS_DIR / "oficio"
 
 # Constantes de regras de negócio
 MESES_PT = {
